@@ -1,0 +1,491 @@
+report zrahul_alv.
+
+
+type-pools: slis.
+
+
+
+TYPES : BEGIN OF ty_vbap,
+
+  color type slis_t_specialcol_alv,
+
+  vbeln TYPE vbap-vbeln,
+
+  posnr TYPE vbap-posnr,
+
+  matnr TYPE vbap-matnr,
+
+  matwa TYPE vbap-matwa,
+
+  pmatn TYPE vbap-pmatn,
+
+  matkl TYPE vbap-matkl,
+
+  meins TYPE vbap-meins,
+
+  END OF ty_vbap.
+
+
+
+*----------------------------------------------------
+
+*         data declaration
+
+*----------------------------------------------------
+
+
+
+DATA : it_vbap TYPE TABLE OF ty_vbap,
+
+       wa_vbap TYPE ty_vbap.
+
+
+
+DATA : it_fieldcat TYPE slis_t_fieldcat_alv,
+
+       wa_fieldcat TYPE slis_fieldcat_alv.
+
+
+
+DATA : wa_layout TYPE slis_layout_alv,
+
+        it_color type slis_t_specialcol_alv,
+
+        wa_color type slis_specialcol_alv,
+
+        cell_color type slis_color.
+
+
+
+FIELD-SYMBOLS : <fs_vbap> type ty_vbap.
+
+*----------------------------------------------------
+
+*         parameters
+
+*----------------------------------------------------
+
+
+
+SELECTION-SCREEN : BEGIN OF BLOCK b1 WITH FRAME TITLE text-001.
+
+PARAMETERS : opt1 RADIOBUTTON GROUP one DEFAULT 'X',
+
+
+
+             opt2 RADIOBUTTON GROUP one.
+
+SELECTION-SCREEN : END OF BLOCK b1.
+
+
+
+*----------------------------------------------------
+
+*         start of selection
+
+*----------------------------------------------------
+
+
+
+START-OF-SELECTION.
+
+
+
+  PERFORM set_select.
+
+
+
+  PERFORM set_fieldcat.
+
+
+
+  PERFORM set_layout.
+
+
+
+  PERFORM set_color.
+
+
+
+  IF opt1 = 'X'.
+
+    PERFORM set_alv_display.
+
+  ENDIF.
+
+*&---------------------------------------------------------------------*
+
+*&      Form  SET_SELECT
+
+*&---------------------------------------------------------------------*
+
+*       text
+
+*----------------------------------------------------------------------*
+
+*  -->  p1        text
+
+*  <--  p2        text
+
+*----------------------------------------------------------------------*
+
+FORM set_select .
+
+
+
+  SELECT vbeln posnr matnr matwa pmatn matkl meins
+
+      FROM vbap INTO CORRESPONDING FIELDS OF TABLE it_vbap UP TO 200 ROWS.
+
+
+
+ENDFORM.                    " SET_SELECT
+
+*&---------------------------------------------------------------------*
+
+*&      Form  SET_FIELDCAT
+
+*&---------------------------------------------------------------------*
+
+*       text
+
+*----------------------------------------------------------------------*
+
+*  -->  p1        text
+
+*  <--  p2        text
+
+*----------------------------------------------------------------------*
+
+FORM set_fieldcat .
+
+
+
+  CLEAR it_fieldcat.
+
+
+
+  CLEAR wa_fieldcat.
+
+  wa_fieldcat-col_pos =   1  .
+
+  wa_fieldcat-fieldname =  'VBELN'.
+
+  wa_fieldcat-ref_fieldname = 'VBELN'.
+
+  wa_fieldcat-ref_tabname = 'VBAP'.
+
+
+
+  APPEND wa_fieldcat TO it_fieldcat.
+
+*----------------------------------------------------------------------*
+
+
+
+  CLEAR wa_fieldcat.
+
+  wa_fieldcat-col_pos =   2  .
+
+  wa_fieldcat-fieldname =  'POSNR'.
+
+  wa_fieldcat-ref_fieldname = 'POSNR'.
+
+  wa_fieldcat-ref_tabname = 'VBAP'.
+
+
+
+
+
+  APPEND wa_fieldcat TO it_fieldcat.
+
+*----------------------------------------------------------------------*
+
+
+
+  CLEAR wa_fieldcat.
+
+  wa_fieldcat-col_pos =   3  .
+
+  wa_fieldcat-fieldname =  'MATNR'.
+
+  wa_fieldcat-ref_fieldname = 'MATNR'.
+
+  wa_fieldcat-ref_tabname = 'VBAP'.
+
+
+
+  APPEND wa_fieldcat TO it_fieldcat.
+
+*----------------------------------------------------------------------*
+
+  CLEAR wa_fieldcat.
+
+  wa_fieldcat-col_pos =   4  .
+
+  wa_fieldcat-fieldname =  'MATWA'.
+
+  wa_fieldcat-ref_fieldname = 'MATWA'.
+
+  wa_fieldcat-ref_tabname = 'VBAP'.
+
+
+
+  APPEND wa_fieldcat TO it_fieldcat.
+
+*----------------------------------------------------------------------*
+
+
+
+  CLEAR wa_fieldcat.
+
+  wa_fieldcat-col_pos =   5  .
+
+  wa_fieldcat-fieldname =  'PMATN'.
+
+  wa_fieldcat-ref_fieldname = 'PMATN'.
+
+  wa_fieldcat-ref_tabname = 'VBAP'.
+
+
+
+  APPEND wa_fieldcat TO it_fieldcat.
+
+*----------------------------------------------------------------------*
+
+
+
+  CLEAR wa_fieldcat.
+
+  wa_fieldcat-col_pos =   6  .
+
+  wa_fieldcat-fieldname =  'MATKL'.
+
+  wa_fieldcat-ref_fieldname = 'MATKL'.
+
+  wa_fieldcat-ref_tabname = 'VBAP'.
+
+
+
+  APPEND wa_fieldcat TO it_fieldcat.
+
+*----------------------------------------------------------------------*
+
+  CLEAR wa_fieldcat.
+
+  wa_fieldcat-col_pos =   7  .
+
+  wa_fieldcat-fieldname =  'MEINS'.
+
+  wa_fieldcat-ref_fieldname = 'MEINS'.
+
+  wa_fieldcat-ref_tabname = 'VBAP'.
+
+  wa_fieldcat-lowercase = 'X'.
+
+
+
+  APPEND wa_fieldcat TO it_fieldcat.
+
+ENDFORM.                    "SET_FIELDCAT
+
+*&---------------------------------------------------------------------*
+
+*&      Form  SET_ALV_DISPLAY
+
+*&---------------------------------------------------------------------*
+
+*       text
+
+*----------------------------------------------------------------------*
+
+*  -->  p1        text
+
+*  <--  p2        text
+
+*----------------------------------------------------------------------*
+
+FORM set_alv_display .
+
+
+
+  CALL FUNCTION 'REUSE_ALV_LIST_DISPLAY'
+
+    EXPORTING
+
+*     I_INTERFACE_CHECK        = ' '
+
+*     I_BYPASSING_BUFFER       =
+
+*     I_BUFFER_ACTIVE          = ' '
+
+*     I_CALLBACK_PROGRAM       = ' '
+
+*     I_CALLBACK_PF_STATUS_SET = ' '
+
+*     I_CALLBACK_USER_COMMAND  = ' '
+
+*     i_structure_name         = 'VBAP'
+
+     IS_LAYOUT                = wa_layout
+
+      it_fieldcat              = it_fieldcat
+
+*   IT_EXCLUDING                   =
+
+*   IT_SPECIAL_GROUPS              =
+
+*   IT_SORT                        =
+
+*   IT_FILTER                      =
+
+*   IS_SEL_HIDE                    =
+
+*   I_DEFAULT                      = 'X'
+
+*   I_SAVE                         = ' '
+
+*   IS_VARIANT                     =
+
+*   IT_EVENTS                      =
+
+*   IT_EVENT_EXIT                  =
+
+*   IS_PRINT                       =
+
+*   IS_REPREP_ID                   =
+
+*   I_SCREEN_START_COLUMN          = 0
+
+*   I_SCREEN_START_LINE            = 0
+
+*   I_SCREEN_END_COLUMN            = 0
+
+*   I_SCREEN_END_LINE              = 0
+
+*   IR_SALV_LIST_ADAPTER           =
+
+*   IT_EXCEPT_QINFO                =
+
+*   I_SUPPRESS_EMPTY_DATA          = ABAP_FALSE
+
+* IMPORTING
+
+*   E_EXIT_CAUSED_BY_CALLER        =
+
+*   ES_EXIT_CAUSED_BY_USER         =
+
+  TABLES
+
+    t_outtab                       = it_vbap.
+
+* EXCEPTIONS
+
+*   PROGRAM_ERROR                  = 1
+
+*   OTHERS                         = 2
+
+  .
+
+  IF sy-subrc <> 0.
+
+* Implement suitable error handling here
+
+  ENDIF.
+
+
+
+ENDFORM.                    " SET_ALV_DISPLAY
+
+*&---------------------------------------------------------------------*
+
+*&      Form  SET_LAYOUT
+
+*&---------------------------------------------------------------------*
+
+*       text
+
+*----------------------------------------------------------------------*
+
+*  -->  p1        text
+
+*  <--  p2        text
+
+*----------------------------------------------------------------------*
+
+FORM set_layout .
+
+  CLEAR wa_layout.
+
+
+
+  wa_layout-zebra = 'X'.
+
+  wa_layout-no_vline = ' '.
+
+  wa_layout-no_hline = ' '.
+
+  wa_layout-numc_sum = 'X'.
+
+  wa_layout-colwidth_optimize = 'X'.
+
+  wa_layout-coltab_fieldname = 'COLOR'.
+
+endform.
+
+*&---------------------------------------------------------------------*
+
+*&      Form  SET_COLOR
+
+*&---------------------------------------------------------------------*
+
+*       text
+
+*----------------------------------------------------------------------*
+
+*  -->  p1        text
+
+*  <--  p2        text
+
+*----------------------------------------------------------------------*
+
+form SET_COLOR .
+
+
+
+loop at it_vbap ASSIGNING <fs_vbap>.
+
+  
+
+clear it_color.
+
+
+
+clear cell_color.
+
+cell_color-col = 4.
+
+cell_color-int = 1 .
+
+cell_color-inv = ' '.
+
+
+
+clear wa_color.
+
+wa_color-fieldname = 'VBELN'.
+
+wa_color-color = cell_color.
+
+
+
+APPEND wa_color to it_color.
+
+
+
+<fs_vbap>-color = it_color.
+
+ENDLOOP.
+
+endform.                     " SET_COLOR
+
