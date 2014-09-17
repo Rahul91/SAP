@@ -1,0 +1,771 @@
+REPORT  zrahul_interactive.
+
+**tables: zrahul_44, zrahul_dep44.
+**
+**data : it_rahul44 type TABLE OF zrahul_44,
+**       it_dep44 type TABLE OF zrahul_dep44,
+**       wa_rahul44 type zrahul_44,
+**       wa_dep44 type zrahul_dep44,
+**       c_box type c.
+**
+**
+**
+**FIELD-SYMBOLS : <fs_rahul44> TYPE zrahul_44,
+**                 <fs_dep44> TYPE zrahul_dep44.
+**
+**START-OF-selection.
+**       select * FROM zrahul_44 into TABLE it_rahul44.
+**
+**         WRITE : /10 'Emp_id', 30 'Emp_Name', 50 'Emp_Age'.
+**         uline.
+**
+**        LOOP at it_rahul44 into wa_rahul44.
+**          write : /2  c_box as CHECKBOX,was_used,
+**                   wa_rahul44-zemp_id,
+**                   30 wa_rahul44-zemp_name,
+**                   50  wa_rahul44-zemp_age.
+**
+**          hide wa_rahul44-zemp_id.
+**          ENDLOOP.
+**
+**
+**at LINE-SELECTION.
+**case sy-lsind.
+**  when 1.
+**  check sy-lsind le 3.
+**      SELECT * FROM zrahul_dep44 into TABLE it_dep44 WHERE zemp_id = wa_rahul44-zemp_id.
+**        write:/10 'emp_id', 30 'emp_dep_id', 50 'EMp_dep_name'.
+**        uline.
+**
+**        loop at it_dep44 into wa_dep44.
+**          write:/  wa_dep44-zemp_id,30 wa_dep44-zdep_id, 50 wa_dep44-zdep_name.
+**
+**          ENDLOOP.
+**
+**  when 2.
+**    write :/ 'you are on :', sy-lsind.
+**ENDCASE.
+**          uline.
+**
+**  TOP-OF-PAGE.
+**  FORMAT COLOR 4 ON INTENSIFIED ON.
+**  WRITE : / 'Employee Details'.
+**
+**  SKIP.  WRITE: SY-ULINE.  SKIP.
+**  FORMAT COLOR OFF INTENSIFIED OFF.
+**
+**
+**  TOP-OF-PAGE DURING LINE-SELECTION.
+***  data : col TYPE c VALUE 1.
+**
+**  FORMAT COLOR 5 ON INTENSIFIED ON.
+****  WRITE : / 'Dept. Details'.
+****           while col lt 8.
+****           WRITE: / 'this is ' COLOR COL_BACKGROUND AS CHECKBOX CENTERED CURRENCY col .
+****           col = col + 1.
+****           endwhile.
+****
+**
+**  SKIP.  WRITE: SY-ULINE.  SKIP.
+**  FORMAT COLOR OFF INTENSIFIED OFF.
+**
+**  at pf06.
+**    CHECK sy-lsind le 3.
+**    WINDOW STARTING AT 5 20
+**             ENDING AT  15 30.
+***    write : 'You have clicked F6'.
+**
+**    DO.
+**    CLEAR C_BOX.
+**    READ LINE SY-INDEX FIELD VALUE C_BOX.
+**    IF SY-SUBRC <> 0.
+**      EXIT.
+**    ELSE.
+**      CHECK C_BOX = 'X'.
+**      MODIFY CURRENT LINE FIELD VALUE  WAS_USED FROM '*'
+**                                       C_BOX FROM SPACE
+**                          FIELD FORMAT C_BOX INPUT OFF.
+**
+**      WRITE: /10 SY-INDEX, 30 WA_SCARR-CARRID.
+**    ENDIF.
+**  ENDDO.
+**
+**
+**
+
+**TABLES lfa1.
+**
+**data: it_lfa1 TYPE TABLE OF lfa1,
+**      wa_lfa1 type lfa1,
+**      c_box type c,
+**      was_used type c.
+**
+**
+**START-OF-SELECTION.
+**
+**SELECT * from lfa1 into TABLE it_lfa1.
+**  write:/10 'vendor id number', 40 'vendor name', 80 'vendor city'.
+**  uline.
+**  loop at it_lfa1 into wa_lfa1.
+**    write:/ c_box as CHECKBOX,was_used,
+**             10 wa_lfa1-lifnr,
+**             40 wa_lfa1-name1,
+**             80 wa_lfa1-ort01.
+**    HIDE: wa_lfa1-lifnr, wa_lfa1-name1, wa_lfa1-ort01.
+**    endloop.
+**
+**
+** at pf05.
+**   check sy-lsind eq 1.
+**   WINDOW STARTING AT 10 10
+**            ENDING AT 120 30 .
+**
+**      write: 'this wnidow will eventually contain the invoices for the selected vendor'.
+**      skip.
+**
+**    write:/10 'vendor id number', 40 'vendor name', 80 'vendor city'.
+**     uline.
+**   DO.
+**    CLEAR C_BOX.
+**    READ LINE SY-INDEX FIELD VALUE C_BOX.
+**    IF SY-SUBRC <> 0.
+**      EXIT.
+**    ELSE.
+**      CHECK C_BOX = 'X'.
+**      MODIFY CURRENT LINE FIELD VALUE  WAS_USED FROM '*'
+**                                       C_BOX FROM SPACE
+**                          FIELD FORMAT C_BOX INPUT OFF.
+**
+**
+**      WRITE: /10 wa_lfa1-lifnr,
+**             40 wa_lfa1-name1,
+**             80 wa_lfa1-ort01.
+**    ENDIF.
+**  ENDDO.
+**
+** at pf06.
+**   check sy-lsind eq 1.
+**   WINDOW STARTING AT 10 10
+**            ENDING AT 120 30.
+**
+**      write: 'this wnidow will eventually contain the invoices for the selected vendor in descending order'.
+**      skip.
+**      write:/10 'vendor id number', 40 'vendor name', 80 'vendor city'.
+**       uline.
+**
+***    SORT it_lfa1 DESCENDING .
+**
+**      DO.
+**    CLEAR C_BOX.
+**    READ LINE SY-INDEX FIELD VALUE C_BOX.
+**    IF SY-SUBRC <> 0.
+**      EXIT.
+**    ELSE.
+**      CHECK C_BOX = 'X'.
+**      MODIFY CURRENT LINE FIELD VALUE  WAS_USED FROM '*'
+**                                       C_BOX FROM SPACE
+**                          FIELD FORMAT C_BOX INPUT OFF.
+**
+***     SORT it_lfa1 DESCENDING .
+**      WRITE: /10 wa_lfa1-lifnr,
+**             40 wa_lfa1-name1,
+**             80 wa_lfa1-ort01.
+**
+**    ENDIF.
+**  ENDDO.
+**
+**
+**
+**
+**at pf07.
+**  check sy-lsind eq 1.
+**   WINDOW STARTING AT 10 10
+**            ENDING AT 120 30.
+**
+**      SORT it_lfa1 ASCENDING .
+**
+**      write: 'this wnidow will eventually contain the invoices for the selected vendor in ascending order'.
+**     DO.
+**    CLEAR C_BOX.
+**    READ LINE SY-INDEX FIELD VALUE C_BOX.
+**    IF SY-SUBRC <> 0.
+**      EXIT.
+**    ELSE.
+**      CHECK C_BOX = 'X'.
+**      MODIFY CURRENT LINE FIELD VALUE  WAS_USED FROM '*'
+**                                       C_BOX FROM SPACE
+**                          FIELD FORMAT C_BOX INPUT OFF.
+**
+**      WRITE: /10 wa_lfa1-lifnr,
+**             40 wa_lfa1-name1,
+**             80 wa_lfa1-ort01.
+**
+**    ENDIF.
+**  ENDDO.
+**
+**
+**** at pf08.
+****   WINDOW STARTING AT 10 10
+****            ENDING AT 20 50.
+****
+****      write: 'this wnidow will eventually contain the invoices for the selected vendor'.
+**
+**
+**
+**
+
+
+
+**DATA : it_vbak TYPE SORTED TABLE OF vbak WITH UNIQUE KEY vbeln,
+**       it_vbap TYPE TABLE OF vbap,
+**       wa_vbak TYPE vbak,
+**       wa_vbap TYPE vbap,
+**       v_field(40)  TYPE c,
+**       v_val(20)    TYPE c.
+**
+**
+**CLEAR : it_vbap, it_vbak.
+**
+**START-OF-SELECTION.
+**  SET PF-STATUS 'STATUS_01'.
+**  SET TITLEBAR 'TITLE_01'.
+**
+**  SELECT *
+**   FROM vbak
+**   INTO TABLE it_vbak
+**   UP TO 25 ROWS.
+**
+**  LOOP AT it_vbak INTO wa_vbak.
+**    WRITE: /10 wa_vbak-vbeln HOTSPOT,
+**            25 wa_vbak-erdat,
+**            41 wa_vbak-ernam.
+**
+**    HIDE wa_vbak-vbeln.
+**  ENDLOOP.
+**
+**AT USER-COMMAND.
+**  CASE sy-ucomm.
+**    WHEN 'NEWLIST'.
+**      SET TITLEBAR 'TITLE_02'.
+**      SET PF-STATUS 'STATUS_02'.
+**
+**      SELECT *
+**        FROM vbap
+**        INTO TABLE it_vbap
+**        WHERE vbeln = wa_vbak-vbeln.
+**
+**      LOOP AT it_vbap INTO wa_vbap.
+**        WRITE: /10 wa_vbap-vbeln,
+**                25 wa_vbap-posnr,
+**                41 wa_vbap-matnr.
+**      ENDLOOP.
+**
+**    WHEN 'PRIOR'.
+**      SET TITLEBAR 'TITLE_01'.
+**      SET PF-STATUS 'STATUS_01'.
+**
+**      LOOP AT it_vbak INTO wa_vbak.
+**        WRITE: /10 wa_vbak-vbeln ,
+**                25 wa_vbak-erdat,
+**                41 wa_vbak-ernam.
+**
+**        HIDE: wa_vbak-vbeln.
+**      ENDLOOP.
+**
+**    WHEN 'BACK'(001).
+**      LEAVE TO SCREEN 0.
+**    WHEN 'EXIT'.
+**      LEAVE PROGRAM.
+**    WHEN 'CANCEL'.
+**      LEAVE TO SCREEN 0.
+**  ENDCASE.
+
+
+
+
+
+**TABLES : SCARR,SPFLI.
+**
+**DATA : IT_SCARR    TYPE SORTED TABLE OF SCARR WITH UNIQUE KEY CARRID,
+**       IT_SPFLI    TYPE TABLE OF SPFLI,
+**       WA_SCARR    TYPE SCARR,
+**       WA_SPFLI    TYPE SPFLI,
+****       V_FIELD(40) TYPE C,
+****       V_VAL(20)   TYPE C.
+**
+**
+**START-OF-SELECTION.
+** set PF-STATUS 'STATUS_03'.
+** set TITLEBAR 'TITLE_03'.
+**  SELECT *
+**    FROM SCARR
+**    INTO TABLE IT_SCARR.
+**
+**  WRITE: /10 'Airline Code',
+**          25 'Airline name',
+**          55 'Local currency of airline'.
+**  ULINE.
+**
+**  LOOP AT IT_SCARR INTO WA_SCARR.
+**    WRITE : /10 WA_SCARR-CARRID,
+**             25 WA_SCARR-CARRNAME,
+**             55 WA_SCARR-CURRCODE.
+**
+**    HIDE WA_SCARR-CARRID.
+**  ENDLOOP.
+**
+** AT USER-COMMAND.
+**  CASE sy-ucomm.
+**
+**
+**  when 'NEXTSCREEN'.
+**    set PF-STATUS 'STATUS_04'.
+**    set TITLEBAR 'TITLE_04'.
+**
+**    SELECT *
+**        FROM SPFLI
+**        INTO TABLE IT_SPFLI
+**        WHERE CARRID = WA_SCARR-CARRID.
+**
+**      WRITE: /10  'Airline Code',
+**              25  'Flight Connection Number',
+**              45  'Country Key',
+**              65  'Departure city',
+**              85  'Departure airport',
+**              105 'Country Key',
+**              125 'Arrival city',
+**              145 'Arrival airport',
+**              165 'Flight time',
+**              185 'Departure time',
+**              205 'Arrival time',
+**              215 'Distance',
+**              235 'Mass unit of distance (kms, miles)',
+**              255 'Flight type',
+**              275 'Arrival n day(s) later'.
+**      ULINE.
+**      SKIP.
+**
+**    LOOP AT IT_SPFLI INTO WA_SPFLI.
+**        WRITE : /10  WA_SPFLI-CARRID,
+**                 25  WA_SPFLI-CONNID,
+**                 45  WA_SPFLI-COUNTRYFR,
+**                 65  WA_SPFLI-CITYFROM,
+**                 85  WA_SPFLI-AIRPFROM,
+**                 105 WA_SPFLI-COUNTRYTO,
+**                 125 WA_SPFLI-CITYTO,
+**                 145 WA_SPFLI-AIRPTO,
+**                 165 WA_SPFLI-FLTIME,
+**                 185 WA_SPFLI-DEPTIME,
+**                 205 WA_SPFLI-ARRTIME,
+**                 215 WA_SPFLI-DISTANCE,
+**                 235 WA_SPFLI-DISTID,
+**                 255 WA_SPFLI-FLTYPE,
+**                 275 WA_SPFLI-PERIOD.
+**      ENDLOOP.
+**
+**      when 'PRE.SCREEN'.
+**
+**         set PF-STATUS 'STATUS_03'.
+**         set TITLEBAR 'TITLE_03'.
+**
+**          WRITE: /10 'Airline Code',
+**          25 'Airline name',
+**          55 'Local currency of airline'.
+**          ULINE.
+**
+**         LOOP AT IT_SCARR INTO WA_SCARR.
+**          WRITE : /10 WA_SCARR-CARRID,
+**             25 WA_SCARR-CARRNAME,
+**             55 WA_SCARR-CURRCODE.
+**          ENDLOOP.
+**
+**
+**     WHEN 'BACK'.
+**       LEAVE TO SCREEN 0.
+**
+**     WHEN 'EXIT'.
+**      LEAVE PROGRAM.
+**
+**     WHEN 'CANCEL'.
+**      LEAVE TO SCREEN 0.
+**
+**    endcase.
+
+
+
+
+
+
+**TABLES SSCRFIELDS.
+**
+**DATA : C        TYPE I,
+**       OPERATOR TYPE C.
+**
+**PARAMETERS : A TYPE I OBLIGATORY,
+**             B TYPE I OBLIGATORY.
+**
+**AT SELECTION-SCREEN OUTPUT.
+**  SET PF-STATUS 'GUI_STAT'.
+**  SET TITLEBAR 'CALCULATOR'.
+**
+**AT SELECTION-SCREEN.
+**  CASE SSCRFIELDS-UCOMM.
+**    WHEN 'PLUS'.
+**      OPERATOR = '+'.
+**    WHEN 'MINUS'.
+**      IF A < B.
+**        MESSAGE E000(ZMSG_AEN).
+**      ELSE.
+**        OPERATOR = '-'.
+**      ENDIF.
+**    WHEN 'BACK' OR 'EXIT' OR 'CANCEL'.
+**      LEAVE PROGRAM.
+**    WHEN OTHERS.
+**      LEAVE TO SCREEN 1000.
+**  ENDCASE.
+**
+**  LEAVE TO SCREEN 0.
+**
+**START-OF-SELECTION.
+**  CASE OPERATOR.
+**    WHEN '+'.
+**      C = A + B.
+**    WHEN '-'.
+**      C = A - B.
+**  ENDCASE.
+**
+**  WRITE C.
+
+
+
+**
+**TABLES : zrahul_44.
+**
+****SET PF-STATUS 'STATUS_05'.
+****set TITLEBAR 'TITLE_01'.
+**
+**data: it_tab type TABLE OF zrahul_44,
+**      wa_tab type zrahul_44,
+**      signal type i.
+**
+**parameters : p_id type zemp_id.
+**
+**
+**at SELECTION-SCREEN OUTPUT.
+**  set PF-STATUS 'STATUS_06'.
+**  set TITLEBAR 'TITLE_06'.
+**
+**** START-OF-SELECTION.
+**AT SELECTION-SCREEN.
+** case sy-ucomm.
+**
+**  when 'SUBMIT'.
+**    signal = '1'.
+**** SET PF-STATUS 'STATUS_05'.
+****  SELECT * FROM zrahul_44 into TABLE it_tab.
+****    write : / 'Emp_id', 30 'Emp_name', 60 'Emp_age'.
+****    uline.
+****    skip.
+****
+****    loop at it_tab into wa_tab where zemp_id = p_id.
+****      write :/ wa_tab-zemp_id, 30 wa_tab-zemp_name,60 wa_tab-zemp_age.
+****      endloop.
+**
+** WHEN 'BACK' or 'exit' or 'cancel'.
+**       LEAVE PROGRAM.
+** when OTHERS.
+**    leave to SCREEN 1000.
+**ENDCASE.
+**
+**LEAVE TO SCREEN 0.
+
+**START-OF-SELECTION.
+**case signal.
+**  when '1'.
+**     SELECT * FROM zrahul_44 into TABLE it_tab.
+**      write : / 'Emp_id', 30 'Emp_name', 60 'Emp_age'.
+***    uline.
+**    skip.
+**
+**    loop at it_tab into wa_tab where zemp_id = p_id.
+***      write :/ wa_tab-zemp_id, 30 wa_tab-zemp_name,60 wa_tab-zemp_age.
+**     .
+**      endloop.
+**endcase.
+**
+**write :/ wa_tab-zemp_id, 30 wa_tab-zemp_name,60 wa_tab-zemp_age.
+
+
+
+
+**TYPE-POOLS slis.
+**
+**DATA : it_fieldset TYPE slis_t_fieldcat_alv,
+**       wa_fieldset TYPE slis_fieldcat_alv.
+**
+**TYPES : BEGIN OF ty_ekko,
+**           ebeln TYPE ekko-ebeln,
+**        END OF ty_ekko,
+**
+**        BEGIN OF ty_ekpo,
+**           ebeln TYPE ekpo-ebeln,
+**           ebelp TYPE ekpo-ebelp,
+**           loekz TYPE ekpo-loekz,
+**           loekz TYPE ekpo-statu,
+**           aedat TYPE ekpo-aedat,
+**           txz01 TYPE ekpo-txz01,
+**           matnr TYPE ekpo-matnr,
+**           ematn TYPE ekpo-ematn,
+**           burks TYPE ekpo-burks,
+**           werks TYPE ekpo-werks,
+**           lgort TYPE ekpo-lgort,
+**           bednr TYPE ekpo-bednr,
+**           matkl TYPE ekpo-matkl,
+**           menge TYPE ekpo-menge,
+**           meins TYPE ekpo-meins,
+**        END OF ty_ekppo.
+**
+**data : it_ekko type STANDARD TABLE OF ty_ekko,
+**       it_ekpo TYPE STANDARD TABLE OF ty_ekpo.
+**
+**INITIALIZATION.
+**        refresh : it_ekko, it_ekpo.
+**
+**START-OF-SELECTION.
+**        SELECT ebeln FROM ekko into TABLE it_ekko UP TO 200 ROWS.
+**
+**          if it_ekko is NOT INITIAL.
+**            SELECT
+**              ebeln
+**              ebelp
+**              loekz
+**              loekz
+**              aedat
+**              txz01
+**              matnr
+**              ematn
+**              burks
+**              werks
+**              lgort
+**              bednr
+**              matkl
+**              menge
+**              meins FROM EKPO INTO TABLE it_ekpo
+**              for ALL ENTRIES IN it_ekko
+**              WHERE ebeln = it_ekko-ebeln.
+**           endif.
+**
+**PERFORM SET_FIELDCAT USING
+
+
+
+
+
+
+
+**--------------------------------------------------------------------------
+**alv grid display for sflight, scarr, scarr
+**--------------------------------------------------------------------------
+
+TABLES : SFLIGHT,
+         SCARR,
+         SPFLI.
+
+TYPES : BEGIN OF TY_PLAIN,
+             CARRID TYPE SFLIGHT-CARRID,
+             CONNID TYPE SFLIGHT-CONNID,
+             FLDATE TYPE SFLIGHT-FLDATE,
+             PRICE TYPE SFLIGHT-PRICE,
+             CURRENCY TYPE SFLIGHT-CURRENCY,
+             PLANETYPE TYPE SFLIGHT-PLANETYPE,
+             SEATSMAX TYPE SFLIGHT-SEATSMAX,
+             SEATSOCC TYPE SFLIGHT-SEATSOCC,
+             PAYMENTSUM TYPE SFLIGHT-PAYMENTSUM,
+             SEATSMAX_B TYPE SFLIGHT-SEATSMAX_B,
+             SEATSOCC_B TYPE SFLIGHT-SEATSOCC_B,
+             SEATSMAX_F TYPE SFLIGHT-SEATSMAX_F,
+             SEATSOCC_F TYPE SFLIGHT-SEATSOCC_F,
+             CARRNAME TYPE SCARR-CARRNAME,
+        END OF TY_PLAIN.
+
+DATA: IT_PLAIN TYPE STANDARD TABLE OF TY_PLAIN,
+      wa_plain type ty_plain,
+
+      it_fieldcat type slis_t_fieldcat_alv,
+      wa_fieldcat type slis_fieldcat_alv.
+
+SELECTION-SCREEN: BEGIN OF BLOCK B1 WITH FRAME TITLE TEXT-005.
+PARAMETERS : RAD1 RADIOBUTTON GROUP ONE DEFAULT 'X',
+             RAD2 RADIOBUTTON GROUP ONE.
+SELECTION-SCREEN: END OF BLOCK B1.
+
+REFRESH IT_PLAIN.
+
+START-OF-SELECTION.
+
+IF RAD1 = 'X'.
+     SELECT
+       A~CARRID
+       A~CONNID
+       B~FLDATE
+       B~PRICE
+       B~CURRENCY
+       B~PLANETYPE
+       B~SEATSMAX
+       B~SEATSOCC
+       B~PAYMENTSUM
+       B~SEATSMAX_B
+       B~SEATSOCC_B
+       B~SEATSMAX_F
+       B~SEATSOCC_F
+       C~CARRNAME
+       INTO TABLE IT_PLAIN
+       FROM ( ( SPFLI AS A
+       INNER JOIN SFLIGHT AS B
+       ON B~CARRID = A~CARRID
+       AND B~CONNID = A~CONNID )
+       INNER JOIN SCARR AS C
+       ON B~CARRID = C~CARRID ).
+ENDIF.
+
+
+clear it_fieldcat.
+
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 1.
+wa_fieldcat-fieldname = 'CARRID'.
+wa_fieldcat-tabname   = 'SPFLI'.
+wa_fieldcat-ref_fieldname = 'CARRID'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 2.
+wa_fieldcat-fieldname = 'CONNID'.
+wa_fieldcat-tabname   = 'SPFLI'.
+wa_fieldcat-ref_fieldname = 'CONNID'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 3.
+wa_fieldcat-fieldname = 'FLDATE'.
+wa_fieldcat-tabname   = 'SFLIGHT'.
+wa_fieldcat-ref_fieldname = 'FLDATE'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 4.
+wa_fieldcat-fieldname = 'PRICE'.
+wa_fieldcat-tabname   = 'SFLIGHT'.
+wa_fieldcat-ref_fieldname = 'PRICE'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 5.
+wa_fieldcat-fieldname = 'CURRENCY'.
+wa_fieldcat-tabname   = 'SFLIGHT'.
+wa_fieldcat-ref_fieldname = 'CURRENCY'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 6.
+wa_fieldcat-fieldname = 'PLANETYPE'.
+wa_fieldcat-tabname   = 'SFLIGHT'.
+wa_fieldcat-ref_fieldname = 'PLANETYPE'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 7.
+wa_fieldcat-fieldname = 'SEATMAX'.
+wa_fieldcat-tabname   = 'SFLIGHT'.
+wa_fieldcat-ref_fieldname = 'SEATMAX'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 8.
+wa_fieldcat-fieldname = 'SEATSOCC'.
+wa_fieldcat-tabname   = 'SFLIGHT'.
+wa_fieldcat-ref_fieldname = 'SEATSOCC'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 9.
+wa_fieldcat-fieldname = 'PAYMENTSUM'.
+wa_fieldcat-tabname   = 'SFLIGHT'.
+wa_fieldcat-ref_fieldname = 'PAYMENTSUM'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+clear wa_fieldcat.
+wa_fieldcat-col_pos  = 10.
+wa_fieldcat-fieldname = 'CARRNAME'.
+wa_fieldcat-tabname   = 'SCARR'.
+wa_fieldcat-ref_fieldname = 'CARRNAME'.
+
+APPEND wa_fieldcat to it_fieldcat.
+**--------------------------------------------------------------------------------------
+
+
+CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+ EXPORTING
+***   I_INTERFACE_CHECK                 = ' '
+***   I_BYPASSING_BUFFER                = ' '
+***   I_BUFFER_ACTIVE                   = ' '
+**   I_CALLBACK_PROGRAM                = SY-REPID
+***   I_CALLBACK_PF_STATUS_SET          = ' '
+***   I_CALLBACK_USER_COMMAND           = ' '
+***   I_CALLBACK_TOP_OF_PAGE            = ' '
+***   I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+***   I_CALLBACK_HTML_END_OF_LIST       = ' '
+**      I_STRUCTURE_NAME                  =    .
+***   I_BACKGROUND_ID                   = ' '
+***   I_GRID_TITLE                      =
+***   I_GRID_SETTINGS                   =
+***   IS_LAYOUT                         =
+      IT_FIELDCAT                       =  it_fieldcat
+***   IT_EXCLUDING                      =
+***   IT_SPECIAL_GROUPS                 =
+***   IT_SORT                           =
+***   IT_FILTER                         =
+***   IS_SEL_HIDE                       =
+***   I_DEFAULT                         = 'X'
+***   I_SAVE                            = ' '
+***   IS_VARIANT                        =
+***   IT_EVENTS                         =
+***   IT_EVENT_EXIT                     =
+***   IS_PRINT                          =
+***   IS_REPREP_ID                      =
+***   I_SCREEN_START_COLUMN             = 0
+***   I_SCREEN_START_LINE               = 0
+***   I_SCREEN_END_COLUMN               = 0
+***   I_SCREEN_END_LINE                 = 0
+***   I_HTML_HEIGHT_TOP                 = 0
+***   I_HTML_HEIGHT_END                 = 0
+***   IT_ALV_GRAPHICS                   =
+***   IT_HYPERLINK                      =
+***   IT_ADD_FIELDCAT                   =
+***   IT_EXCEPT_QINFO                   =
+***   IR_SALV_FULLSCREEN_ADAPTER        =
+*** IMPORTING
+***   E_EXIT_CAUSED_BY_CALLER           =
+***   ES_EXIT_CAUSED_BY_USER            =
+  TABLES
+    t_outtab                          = IT_PLAIN.
+*** EXCEPTIONS
+***   PROGRAM_ERROR                     = 1
+***   OTHERS                            = 2
+**          .
+IF sy-subrc <> 0.
+** Implement suitable error handling here
+ENDIF.
+*
+*loop at it_plain into wa_plain.
+*  write :/ wa_plain-carrid, wa_plain-connid, wa_plain-carrname, wa_plain-fldate, wa_plain-price.
+*  endloop.
