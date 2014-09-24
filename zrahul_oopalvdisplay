@@ -1,0 +1,203 @@
+*&---------------------------------------------------------------------*
+*& Report  Z_RAHULOOP_ALVDISPLAY
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+REPORT  z_rahuloop_alvdisplay.
+
+TABLES : vbak, vbap.
+
+TYPES: BEGIN OF ty_vbak,
+         vbeln TYPE vbak-vbeln,
+       END OF ty_vbak,
+
+       BEGIN OF ty_vbap,
+         vbeln TYPE vbap-vbeln,
+         posnr TYPE vbap-posnr,
+         matnr TYPE vbap-matnr,
+         arktx TYPE vbap-arktx,
+         netwr TYPE vbap-netwr,
+         meins TYPE vbap-meins,
+         waerk TYPE vbap-waerk,
+        END OF ty_vbap.
+
+DATA :  it_vbak TYPE TABLE OF ty_vbak,
+        it_vbap TYPE TABLE OF ty_vbap,
+        wa_vbap TYPE vbap,
+
+       ls_layout     TYPE lvc_s_layo ,
+       it_fieldcat   TYPE lvc_t_fcat ,
+       ls_fieldcat   TYPE lvc_s_fcat ,
+
+        lr_grid TYPE REF TO cl_gui_alv_grid,
+        lr_container TYPE REF TO cl_gui_custom_container.
+
+
+SELECTION-SCREEN : BEGIN OF BLOCK b1 WITH FRAME TITLE text-001.
+SELECTION-SCREEN : SKIP 2.
+SELECT-OPTIONS: s_vbeln FOR vbak-vbeln.
+SELECTION-SCREEN : SKIP 2.
+SELECTION-SCREEN : END OF BLOCK b1.
+
+
+START-OF-SELECTION.
+
+  PERFORM fetch_records.
+
+  CALL SCREEN 100.
+
+*&---------------------------------------------------------------------*
+*&      Form  fetch_records
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM fetch_records.
+
+  SELECT vbeln FROM
+    vbak INTO TABLE it_vbak
+    WHERE vbeln IN s_vbeln.
+
+  DELETE ADJACENT DUPLICATES FROM it_vbak COMPARING ALL FIELDS.
+
+  IF it_vbak IS NOT INITIAL.
+    SELECT
+         vbeln
+         posnr
+         matnr
+         arktx
+         netwr
+         meins
+         waerk
+         FROM vbap INTO TABLE
+         it_vbap FOR ALL ENTRIES IN it_vbak
+      WHERE vbeln = it_vbak-vbeln.
+  ENDIF.
+
+ENDFORM.                    "fetch_records
+*&---------------------------------------------------------------------*
+*&      Module  STATUS_0100  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE status_0100 OUTPUT.
+  SET PF-STATUS 'STANDARD'.
+  SET TITLEBAR 'ALV_DISPALY'.
+
+ENDMODULE.                 " STATUS_0100  OUTPUT
+*&---------------------------------------------------------------------*
+*&      Module  ALV_100  OUTPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE alv_100 OUTPUT.
+
+
+  IF lr_container IS INITIAL.
+
+    CREATE OBJECT lr_container
+      EXPORTING
+        container_name = 'C_CNTRL'.
+
+    CREATE OBJECT lr_grid
+      EXPORTING
+        i_parent = lr_container.
+
+
+    PERFORM alv_100_layout.
+    PERFORM alv_100_fieldcat.
+
+*  call METHOD lr_grid->set_table_for_first_display
+
+    CALL METHOD lr_grid->set_table_for_first_display
+      EXPORTING
+*       i_buffer_active               =
+*       i_bypassing_buffer            =
+*       i_consistency_check           =
+*       i_structure_name              =
+*       is_variant                    =
+*       i_save                        =
+*       i_default                     = 'X'
+        is_layout                     = ls_layout
+*       is_print                      =
+*       it_special_groups             =
+*       it_toolbar_excluding          =
+*       it_hyperlink                  =
+*       it_alv_graphics               =
+*       it_except_qinfo               =
+*       ir_salv_adapter               =
+      CHANGING
+        it_outtab                     = it_vbap
+        it_fieldcatalog               = it_fieldcat
+*       it_sort                       =
+*       it_filter                     =
+      EXCEPTIONS
+        invalid_parameter_combination = 1
+        program_error                 = 2
+        too_many_lines                = 3
+        OTHERS                        = 4.
+    IF sy-subrc <> 0.
+*  Implement suitable error handling here
+    ENDIF.
+  ENDIF.
+
+ENDMODULE.                 " ALV_100  OUTPUT
+
+*&---------------------------------------------------------------------*
+*&      Form  alv_100_layout
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM alv_100_layout.
+
+  ls_layout-grid_title = 'ALV'.
+ENDFORM.                    "alv_100_layout
+
+*&---------------------------------------------------------------------*
+*&      Form  lav_100_fieldcat
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM alv_100_fieldcat.
+
+  PERFORM set_fieldcat USING    1       'VBELN'   'VBAP' 'SALES_DOCUMENT'  20        .
+  PERFORM set_fieldcat USING    2       'POSNR'   'VBAP' 'SALES_DOCUMENT_ITEM'  20        .
+  PERFORM set_fieldcat USING    3       'MATNR'   'VBAP' 'MATERIAL_NO.'  15        .
+  PERFORM set_fieldcat USING    4       'ARKTX'   'VBAP' 'DESCRIPTION'  30        .
+  PERFORM set_fieldcat USING    5       'NETWR'   'VBAP' 'WEIGHT'  10        .
+  PERFORM set_fieldcat USING    6       'MEINS'   'VBAP' 'MEASURING_UNIT'  10        .
+  PERFORM set_fieldcat USING    7       'WAERK'   'VBAP' 'CURRENCY'  10        .
+ENDFORM.                    "lav_100_fieldcat
+
+
+*FORM set_fieldcat USING position_no.
+FORM set_fieldcat  USING    p_col_pos
+                            p_fieldname
+                            p_tabname
+                            p_coltext
+                            p_outputlen.
+
+  CLEAR ls_fieldcat.
+
+  ls_fieldcat-col_pos   = p_col_pos   .
+  ls_fieldcat-fieldname = p_fieldname .
+  ls_fieldcat-tabname   = p_tabname   .
+  ls_fieldcat-coltext   = p_coltext   .
+  ls_fieldcat-outputlen = p_outputlen .
+
+  APPEND ls_fieldcat TO it_fieldcat   .
+  CLEAR ls_fieldcat.
+ENDFORM.                    "SET_FIELDCAT
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+
+  IF sy-ucomm = 'EXIT'.
+    LEAVE PROGRAM.
+  ENDIF.
+ENDMODULE.                 " USER_COMMAND_0100  INPUT
